@@ -1,13 +1,13 @@
 #include "MainWindow.hh"
 #include "Player.hh"
 #include "Globals.hh"
+#include <iostream>
+
 void gameMain();
 
 void MainWindow::OnPaint()
 {
-    LARGE_INTEGER start{};
-    LARGE_INTEGER end{};
-    QueryPerformanceCounter(&start);
+    QueryPerformanceCounter(&g_deltaStart);
 
     HRESULT hr{CreateGraphicsResources()};
     if (SUCCEEDED(hr))
@@ -30,8 +30,9 @@ void MainWindow::OnPaint()
             InvalidateRect(m_hWnd, NULL, FALSE);
     }
 
-    QueryPerformanceCounter(&end);
-    g_deltaT = static_cast<float>(end.QuadPart - start.QuadPart) / static_cast<float>(g_performanceFrequency.QuadPart);
+    QueryPerformanceCounter(&g_deltaEnd);
+    g_deltaT = static_cast<float>(g_deltaEnd.QuadPart - g_deltaStart.QuadPart) / static_cast<float>(g_performanceFrequency.QuadPart);
+    std::cout << g_deltaT << "\n";
 
     gameMain();
 }
@@ -60,6 +61,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         ValidateRect(m_hWnd, NULL);
         if (MessageBox(m_hWnd, L"Are you sure you want to close?", L"Please be sure", MB_OKCANCEL) == IDOK)
             DestroyWindow(m_hWnd);
+        InvalidateRect(m_hWnd, NULL, FALSE);
         return 0;
     case WM_DESTROY:
         PostQuitMessage(0);
