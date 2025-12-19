@@ -1,0 +1,26 @@
+#include "MainWindow.hh"
+#include "Globals.hh"
+
+void gameStart();
+
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR pCmdLine, int nCmdShow)
+{
+    QueryPerformanceFrequency(&g_performanceFrequency);
+
+    MainWindow win{};
+
+    if (!win.Create(L"MainWindow", WS_OVERLAPPEDWINDOW))
+        return 1;
+
+    ShowWindow(win.Window(), nCmdShow);
+    gameStart();
+
+    MSG msg{};
+    while (GetMessage(&msg, NULL, 0, 0) > 0)
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    return 0;
+}
