@@ -21,6 +21,10 @@ void MainWindow::OnPaint()
         if (g_player)
             g_player->Draw(&pRenderTarget, &pBrush);
 
+        if (g_obstacles.size() > 0)
+            for (int i{0}; i < g_obstacles.size(); i++)
+                g_obstacles[i].Draw(&pRenderTarget, &pBrush);
+
         hr = pRenderTarget->EndDraw();
         EndPaint(m_hWnd, &ps);
 
@@ -32,7 +36,6 @@ void MainWindow::OnPaint()
 
     QueryPerformanceCounter(&g_deltaEnd);
     g_deltaT = static_cast<float>(g_deltaEnd.QuadPart - g_deltaStart.QuadPart) / static_cast<float>(g_performanceFrequency.QuadPart);
-    std::cout << g_deltaT << "\n";
 
     gameMain();
 }
