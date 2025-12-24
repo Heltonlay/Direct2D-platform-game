@@ -14,6 +14,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR pCmdLin
 
     ShowWindow(win.Window(), nCmdShow);
     gameStart();
+    QueryPerformanceCounter(&g_deltaStart);
 
     MSG msg{};
     while (GetMessage(&msg, NULL, 0, 0) > 0)

@@ -7,8 +7,6 @@ void gameMain();
 
 void MainWindow::OnPaint()
 {
-    QueryPerformanceCounter(&g_deltaStart);
-
     HRESULT hr{CreateGraphicsResources()};
     if (SUCCEEDED(hr))
     {
@@ -36,7 +34,7 @@ void MainWindow::OnPaint()
 
     QueryPerformanceCounter(&g_deltaEnd);
     g_deltaT = static_cast<float>(g_deltaEnd.QuadPart - g_deltaStart.QuadPart) / static_cast<float>(g_performanceFrequency.QuadPart);
-
+    QueryPerformanceCounter(&g_deltaStart);
     gameMain();
 }
 
@@ -52,6 +50,7 @@ void MainWindow::Resize()
 
 LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+
     switch (uMsg)
     {
     case WM_SIZE:
