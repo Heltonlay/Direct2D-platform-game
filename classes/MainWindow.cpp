@@ -30,12 +30,12 @@ void MainWindow::OnPaint()
             DiscardGraphicsResources();
         else
             InvalidateRect(m_hWnd, NULL, FALSE);
-    }
 
-    QueryPerformanceCounter(&g_deltaEnd);
-    g_deltaT = static_cast<float>(g_deltaEnd.QuadPart - g_deltaStart.QuadPart) / static_cast<float>(g_performanceFrequency.QuadPart);
-    QueryPerformanceCounter(&g_deltaStart);
-    gameMain();
+        QueryPerformanceCounter(&g_deltaEnd);
+        g_deltaT = static_cast<float>(g_deltaEnd.QuadPart - g_deltaStart.QuadPart) / static_cast<float>(g_performanceFrequency.QuadPart);
+        QueryPerformanceCounter(&g_deltaStart);
+        gameMain();
+    }
 }
 
 void MainWindow::Resize()
