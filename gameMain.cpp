@@ -24,9 +24,14 @@ void gameStart()
             D2D1::Point2F(250, 50),
         },
         {
-            D2D1::Point2F(180, 200),
-            D2D1::Point2F(50, 100),
-        }};
+            D2D1::Point2F(180, 280),
+            D2D1::Point2F(50, 20),
+        },
+        {
+            D2D1::Point2F(240, 260),
+            D2D1::Point2F(50, 40),
+        },
+    };
 
     lastPos = g_player->GetPosition();
 }
@@ -41,7 +46,7 @@ void gameMain()
 
     mov.y = gravity * g_deltaT;
     velocity = mov;
-    gravity += 9.81f * 30 * g_deltaT;
+    gravity += 9.81f * 40 * g_deltaT;
 
     D2D1_POINT_2F playerPos{g_player->GetPosition()};
 
@@ -62,7 +67,7 @@ void gameMain()
 
     if (normaly != 0.0f)
     {
-        gravity = 0.1f;
+        gravity = 1.0f;
         if (normaly == -1.0f)
             isGrounded = true;
     }
@@ -77,7 +82,7 @@ void gameMain()
 
     if (GetKey(VK_SPACE))
     {
-        if (isSpaceReleased)
+        if (isSpaceReleased && isGrounded)
             gravity = -150.0f;
         isSpaceReleased = false;
     }
