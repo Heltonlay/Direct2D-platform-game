@@ -9,18 +9,20 @@ public:
     {
     }
 
-    D2D1_POINT_2F GetPosition() { return m_position; }
-    D2D1_POINT_2F GetSize() { return m_size; }
+    const D2D1_POINT_2F &GetPosition() const { return m_position; }
+    const D2D1_POINT_2F &GetSize() const { return m_size; }
 
-    void SetPosition(D2D1_POINT_2F position)
+    void SetPosition(float x, float y)
     {
-        m_position = position;
+        m_position.x = x;
+        m_position.y = y;
     }
-    void SetSize(D2D1_POINT_2F size)
+    void SetSize(float x, float y)
     {
-        m_size = size;
+        m_size.x = x;
+        m_size.y = y;
     }
-    void Draw(ID2D1HwndRenderTarget **pRenderTarget, ID2D1SolidColorBrush **pBrush);
+    void Draw(ID2D1HwndRenderTarget **pRenderTarget, ID2D1SolidColorBrush **pBrush) const;
 
 private:
     D2D1_POINT_2F m_position;

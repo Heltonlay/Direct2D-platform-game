@@ -5,14 +5,22 @@
 
 void gameMain();
 
+RECT rc{};
+
 void MainWindow::OnPaint()
 {
     HRESULT hr{CreateGraphicsResources()};
+
+    if (rc.right == 0)
+        GetClientRect(m_hWnd, &rc);
+
     if (SUCCEEDED(hr))
     {
         PAINTSTRUCT ps;
         BeginPaint(m_hWnd, &ps);
         pRenderTarget->BeginDraw();
+
+        pRenderTarget->SetTransform(D2D1::Matrix3x2F::Scale(D2D1::SizeF(rc.right / 1280.0f, rc.bottom / 720.0f)));
 
         pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::DeepSkyBlue));
 
@@ -22,6 +30,8 @@ void MainWindow::OnPaint()
         if (g_obstacles.size() > 0)
             for (int i{0}; i < g_obstacles.size(); i++)
                 g_obstacles[i].Draw(&pRenderTarget, &pBrush);
+
+        pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 
         hr = pRenderTarget->EndDraw();
         EndPaint(m_hWnd, &ps);
@@ -42,7 +52,6 @@ void MainWindow::Resize()
 {
     if (pRenderTarget != NULL)
     {
-        RECT rc;
         GetClientRect(m_hWnd, &rc);
         pRenderTarget->Resize(D2D1::SizeU(rc.right, rc.bottom));
     }
@@ -50,7 +59,6 @@ void MainWindow::Resize()
 
 LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-
     switch (uMsg)
     {
     case WM_SIZE:
@@ -60,10 +68,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         OnPaint();
         return 0;
     case WM_CLOSE:
-        ValidateRect(m_hWnd, NULL);
-        if (MessageBox(m_hWnd, L"Are you sure you want to close?", L"Please be sure", MB_OKCANCEL) == IDOK)
-            DestroyWindow(m_hWnd);
-        InvalidateRect(m_hWnd, NULL, FALSE);
+        DestroyWindow(m_hWnd);
         return 0;
     case WM_DESTROY:
         PostQuitMessage(0);

@@ -9,7 +9,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR pCmdLin
 
     MainWindow win{};
 
-    if (!win.Create(L"MainWindow", WS_OVERLAPPEDWINDOW))
+    if (!win.Create(
+            L"MainWindow", WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME, 0,
+            (GetSystemMetrics(SM_CXSCREEN) / 2) - 512, (GetSystemMetrics(SM_CYSCREEN) / 2) - 300, 1024, 576))
         return 1;
 
     ShowWindow(win.Window(), nCmdShow);
