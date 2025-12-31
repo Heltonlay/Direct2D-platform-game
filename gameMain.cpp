@@ -1,8 +1,10 @@
 #include <windows.h>
 #include <d2d1.h>
 #include <cmath>
-#include "Utils.hh"
+#include <random>
+#include <vector>
 #include "Globals.hh"
+#include "Utils.hh"
 #include <iostream>
 #define GetKey(key) GetAsyncKeyState(key) & 0x8000
 
@@ -11,47 +13,94 @@ bool isGrounded;
 D2D1_POINT_2F velocity{};
 D2D1_POINT_2F movement{};
 D2D1_POINT_2F broadPhaseBoxPos{};
+int direction{0};
 float gravity;
+float lerpSpeed{10.0f};
 float collisionTime{1.0f};
 float normalx{0.0f};
 float normaly{0.0f};
+float cameraShakeTimeX{0.0f};
+float cameraShakeTimeY{0.0f};
 
 void gameStart()
 {
     g_player = new Player();
 
-    g_obstacles = {
+    HANDLE hFile{CreateFile(L"level.lvl", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)};
+    char buffer[100]{};
+    DWORD bytesRead{};
+
+    if (hFile == INVALID_HANDLE_VALUE)
+    {
+        MessageBox(NULL, L"Error trying to open level.lvl file!", L"Error", MB_ICONERROR | MB_OK);
+        PostQuitMessage(1);
+    }
+
+    BOOL result{ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, NULL)};
+
+    CloseHandle(hFile);
+    if (result)
+    {
+        char *charRead{buffer};
+        char value[16]{};
+        int i{0};
+        int valueIndex{0};
+        float values[4];
+        while (*charRead != '\0')
         {
-            D2D1::Point2F(100, 300),
-            D2D1::Point2F(250, 50),
-        },
-        {
-            D2D1::Point2F(180, 280),
-            D2D1::Point2F(50, 20),
-        },
-        {
-            D2D1::Point2F(240, 260),
-            D2D1::Point2F(50, 40),
-        },
-        {
-            D2D1::Point2F(1200, 400),
-            D2D1::Point2F(70, 40),
-        },
-        {
-            D2D1::Point2F(420, 300),
-            D2D1::Point2F(20, 150),
-        },
-    };
+            if (*charRead == '\n')
+            {
+                g_obstacles.push_back({{values[0], values[1]}, {values[2], values[3]}});
+                for (int i{0}; i < 16; value[i++] = 0)
+                    ;
+                i = 0;
+                charRead++;
+                continue;
+            }
+
+            if (*charRead == ',')
+            {
+                values[valueIndex] = std::atof(value);
+
+                i = 0;
+                valueIndex++;
+                for (int i{0}; i < 16; value[i++] = 0)
+                    ;
+
+                if (valueIndex >= 4)
+                    valueIndex = 0;
+            }
+            else
+                value[i] = *charRead;
+
+            i++;
+            charRead++;
+        }
+    }
+    else
+    {
+        MessageBox(NULL, L"Error trying to read level.lvl file!", L"Error", MB_ICONERROR | MB_OK);
+        PostQuitMessage(1);
+    }
 }
 
 void gameMain()
 {
     if (GetKey('A'))
-        movement.x = Utils::Lerp(movement.x, -120.0f, 10.0f * g_deltaT);
+    {
+        movement.x = Utils::Lerp(movement.x, -130.0f, lerpSpeed * g_deltaT);
+        direction = -1;
+    }
     else if (GetKey('D'))
-        movement.x = Utils::Lerp(movement.x, 120.0f, 10.0f * g_deltaT);
+    {
+        movement.x = Utils::Lerp(movement.x, 130.0f, lerpSpeed * g_deltaT);
+        direction = 1;
+    }
     else
-        movement.x = Utils::Lerp(movement.x, 0.0f, 10.0f * g_deltaT);
+    {
+        movement.x = Utils::Lerp(movement.x, 0.0f, lerpSpeed * g_deltaT);
+        direction = 0;
+    }
 
     movement.y = gravity;
     velocity = movement;
@@ -100,12 +149,39 @@ void gameMain()
     if (!(normalx != 0 && normaly != 0))
         g_player->AddPosition(dotprod * normaly, dotprod * normalx);
 
+    lerpSpeed = isGrounded ? 10.0f : 5.0f;
+
     if (GetKey(VK_SPACE))
     {
-        if (isSpaceReleased && isGrounded)
-            gravity = -150.0f;
+        if (isSpaceReleased)
+        {
+            if (isGrounded)
+                gravity = -150.0f;
+            else if (normalx != 0)
+            {
+                gravity -= 150.0f;
+                if (gravity < -150.0f)
+                    gravity = -150.0f;
+                movement.x = -200 * direction;
+            }
+        }
+
         isSpaceReleased = false;
     }
     else
         isSpaceReleased = true;
+
+    if (playerPos.y >= 720.0f)
+    {
+        g_player->SetPosition(0.0f, 0.0f);
+        gravity = 0.0f;
+        cameraShakeTimeX = static_cast<float>(std::rand() % 16 + 4);
+        cameraShakeTimeY = static_cast<float>(std::rand() % 16 + 4);
+    }
+
+    g_cameraPos.x = std::sinf(cameraShakeTimeX) * 8.0f;
+    g_cameraPos.y = std::cosf(cameraShakeTimeY) * 8.0f;
+
+    cameraShakeTimeX = Utils::Lerp(cameraShakeTimeX, 0, 10.0f * g_deltaT);
+    cameraShakeTimeY = Utils::Lerp(cameraShakeTimeY, 0, 10.0f * g_deltaT);
 }

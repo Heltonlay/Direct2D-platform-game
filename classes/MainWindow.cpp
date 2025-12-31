@@ -20,7 +20,9 @@ void MainWindow::OnPaint()
         BeginPaint(m_hWnd, &ps);
         pRenderTarget->BeginDraw();
 
-        pRenderTarget->SetTransform(D2D1::Matrix3x2F::Scale(D2D1::SizeF(rc.right / 1280.0f, rc.bottom / 720.0f)));
+        pRenderTarget->SetTransform(
+            D2D1::Matrix3x2F::Translation(D2D1::SizeF(g_cameraPos.x, g_cameraPos.y)) *
+            D2D1::Matrix3x2F::Scale(D2D1::SizeF(rc.right / 1280.0f, rc.bottom / 720.0f)));
 
         pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::DeepSkyBlue));
 

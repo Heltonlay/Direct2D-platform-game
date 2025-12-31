@@ -14,8 +14,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR pCmdLin
             (GetSystemMetrics(SM_CXSCREEN) / 2) - 512, (GetSystemMetrics(SM_CYSCREEN) / 2) - 300, 1024, 576))
         return 1;
 
-    ShowWindow(win.Window(), nCmdShow);
     gameStart();
+    ShowWindow(win.Window(), nCmdShow);
     QueryPerformanceCounter(&g_deltaStart);
 
     MSG msg{};

@@ -5,6 +5,7 @@
 #include <vector>
 
 extern Player *g_player;
+extern D2D1_POINT_2F g_cameraPos;
 extern float g_deltaT;
 extern LARGE_INTEGER g_deltaStart;
 extern LARGE_INTEGER g_deltaEnd;

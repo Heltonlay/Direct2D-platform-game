@@ -2,6 +2,7 @@
 #define UTILS_HH
 #include <d2d1.h>
 #include <cmath>
+#include <iostream>
 
 namespace Utils
 {
@@ -12,9 +13,9 @@ namespace Utils
 
     inline float Lerp(float a, float b, float t)
     {
-        if (t == 0)
+        if (t == 0.0f)
             return a;
-        if (t == 1)
+        if (t == 1.0f)
             return b;
         return a + (b - a) * t;
     }
