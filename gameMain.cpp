@@ -54,6 +54,7 @@ void gameStart()
                 for (int i{0}; i < 16; value[i++] = 0)
                     ;
                 i = 0;
+                valueIndex = 0;
                 charRead++;
                 continue;
             }
@@ -62,7 +63,7 @@ void gameStart()
             {
                 values[valueIndex] = std::atof(value);
 
-                i = 0;
+                i++;
                 valueIndex++;
                 for (int i{0}; i < 16; value[i++] = 0)
                     ;
@@ -73,7 +74,6 @@ void gameStart()
             else
                 value[i] = *charRead;
 
-            i++;
             charRead++;
         }
     }
