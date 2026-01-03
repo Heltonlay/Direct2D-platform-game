@@ -27,7 +27,7 @@ void gameStart()
     g_player = new Player();
 
     HANDLE hFile{CreateFile(L"level.lvl", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)};
-    char buffer[100]{};
+    char buffer[1024]{};
     DWORD bytesRead{};
 
     if (hFile == INVALID_HANDLE_VALUE)
@@ -42,37 +42,39 @@ void gameStart()
     if (result)
     {
         char *charRead{buffer};
-        char value[16]{};
+        char value[17]{};
         int i{0};
         int valueIndex{0};
         float values[4];
-        while (*charRead != '\0')
+        while (true)
         {
-            if (*charRead == '\n')
+            const char c{*charRead};
+            if (c == ' ' || c == '\t')
             {
-                g_obstacles.push_back({{values[0], values[1]}, {values[2], values[3]}});
-                for (int i{0}; i < 16; value[i++] = 0)
-                    ;
-                i = 0;
-                valueIndex = 0;
                 charRead++;
                 continue;
             }
 
-            if (*charRead == ',')
+            if (c != ',' && c != '\n' && c != '\0')
             {
-                values[valueIndex] = std::atof(value);
-
+                value[i] = c;
                 i++;
-                valueIndex++;
-                for (int i{0}; i < 16; value[i++] = 0)
-                    ;
-
-                if (valueIndex >= 4)
-                    valueIndex = 0;
             }
             else
-                value[i] = *charRead;
+            {
+                value[i] = '\0';
+                i = 0;
+                values[valueIndex] = std::stof(value);
+                std::cout << values[valueIndex] << "\n";
+                valueIndex++;
+                if (valueIndex >= 4)
+                    valueIndex = 0;
+                if (c == '\n' || c == '\0')
+                    g_obstacles.push_back({{values[0], values[1]}, {values[2], values[3]}});
+            }
+
+            if (c == '\0')
+                break;
 
             charRead++;
         }
@@ -97,10 +99,7 @@ void gameMain()
         direction = 1;
     }
     else
-    {
         movement.x = Utils::Lerp(movement.x, 0.0f, lerpSpeed * g_deltaT);
-        direction = 0;
-    }
 
     movement.y = gravity;
     velocity = movement;

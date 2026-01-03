@@ -1,0 +1,1 @@
+g++ -mwindows -municode main.cpp gameMain.cpp classes/*.cpp resources/*.res -ld2d1 -ldwrite -I headers -o main.exe
